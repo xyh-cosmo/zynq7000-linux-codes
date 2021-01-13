@@ -25,11 +25,9 @@
 #include "sleep.h"
 #include <math.h>
 
-#define SpiPs_RecvByte(BaseAddress) \
-		(u8)XSpiPs_In32((BaseAddress) + XSPIPS_RXD_OFFSET)
+#define SpiPs_RecvByte(BaseAddress) (u8)XSpiPs_In32((BaseAddress) + XSPIPS_RXD_OFFSET)
 
-#define SpiPs_SendByte(BaseAddress, Data) \
-		XSpiPs_Out32((BaseAddress) + XSPIPS_TXD_OFFSET, (Data))
+#define SpiPs_SendByte(BaseAddress, Data) XSpiPs_Out32((BaseAddress) + XSPIPS_TXD_OFFSET, (Data))
 
 int spi0_init();
 void spi0_one_write();
@@ -130,23 +128,20 @@ void SpiRead(int ByteCount)
 	int Count;
 	u32 StatusReg;
 
-	StatusReg = XSpiPs_ReadReg(Spi0.Config.BaseAddress,
-					XSPIPS_SR_OFFSET);
+	StatusReg = XSpiPs_ReadReg( Spi0.Config.BaseAddress, XSPIPS_SR_OFFSET );
 
 	/*
 	 * Polling the Rx Buffer for Data
 	 */
 	do{
-		StatusReg = XSpiPs_ReadReg(Spi0.Config.BaseAddress,
-					XSPIPS_SR_OFFSET);
+		StatusReg = XSpiPs_ReadReg( Spi0.Config.BaseAddress, XSPIPS_SR_OFFSET );
 	}while(!(StatusReg & XSPIPS_IXR_RXNEMPTY_MASK));
 
 	/*
 	 * Reading the Rx Buffer
 	 */
 	for(Count = 0; Count < ByteCount; Count++){
-		ReadBuffer[Count] = SpiPs_RecvByte(
-				Spi0.Config.BaseAddress);
+		ReadBuffer[Count] = SpiPs_RecvByte( Spi0.Config.BaseAddress);
 	}
 
 }
@@ -156,13 +151,11 @@ void SpiWrite(u8 *Sendbuffer, int ByteCount)
 	u32 StatusReg;
 	int TransCount = 0;
 
-	StatusReg = XSpiPs_ReadReg(Spi0.Config.BaseAddress,
-				XSPIPS_SR_OFFSET);
+	StatusReg = XSpiPs_ReadReg( Spi0.Config.BaseAddress, XSPIPS_SR_OFFSET );
 
 	while ((ByteCount > 0) &&
 		(TransCount < XSPIPS_FIFO_DEPTH)) {
-		SpiPs_SendByte(Spi0.Config.BaseAddress,
-				*Sendbuffer);
+		SpiPs_SendByte( Spi0.Config.BaseAddress, *Sendbuffer );
 		Sendbuffer++;
 		++TransCount;
 		ByteCount--;
@@ -172,9 +165,7 @@ void SpiWrite(u8 *Sendbuffer, int ByteCount)
 	 * Wait for the transfer to finish by polling Tx fifo status.
 	 */
 	do {
-		StatusReg = XSpiPs_ReadReg(
-				Spi0.Config.BaseAddress,
-					XSPIPS_SR_OFFSET);
+		StatusReg = XSpiPs_ReadReg( Spi0.Config.BaseAddress, XSPIPS_SR_OFFSET );
 	} while ((StatusReg & XSPIPS_IXR_TXOW_MASK) == 0);
 
 }
