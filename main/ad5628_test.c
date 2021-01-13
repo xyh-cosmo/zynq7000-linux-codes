@@ -47,12 +47,15 @@ int main(){
 	// 通过设置A0、A0实现chip selection:
 	// 见原理图U27A。
 	
+
+
 	// 初始化SPI设备，并进行自检。
 	Status = spi0_init();
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI Selftest Example Failed\r\n");
 		return XST_FAILURE;
 	}
+	return 0;
 
 	// 准备SPI“数据=COMMADN+ADDR+DATA”
 	// "X X X X C3 C2 C1 C0 A3 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0 X X X X X X X X"
