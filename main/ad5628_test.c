@@ -19,11 +19,13 @@
 // 1）如何实现A0、A1的配置？需要对什么寄存器进行配置？
 ///////////////////////////////////////////////////////////////////////
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include "xparameters.h"
 #include "xspips.h"
 #include "xil_printf.h"
 #include "sleep.h"
-#include <math.h>
 
 #define SpiPs_RecvByte(BaseAddress) (u8)XSpiPs_In32((BaseAddress) + XSPIPS_RXD_OFFSET)
 
@@ -90,37 +92,55 @@ int spi0_init() {
 	/*
 	 * Initialize the SPI device.
 	 */
+
+	printf("--> debug -- 0\r\n");
+	// printf("@debug in %s: XPAR_XSPIPS_0_DEVICE_ID = %d\r\n",__func__, XPAR_XSPIPS_0_DEVICE_ID);
 	SpiConfig = XSpiPs_LookupConfig(XPAR_XSPIPS_0_DEVICE_ID);
 	if (NULL == SpiConfig) {
+		printf("DEBUG:: %s ==> NULL == SpiConfig! exit now ...\r\n", __func__);
 		return XST_FAILURE;
 	}
 
+	printf("--> debug -- 1\r\n");
+	printf("SpiConfig->BaseAddress = 0x%08x\r\n", SpiConfig->BaseAddress);
+	
 	Status = XSpiPs_CfgInitialize(&Spi0, SpiConfig, SpiConfig->BaseAddress);
+
 	if (Status != XST_SUCCESS) {
+		printf("DEBUG:: %s ==> Status == XST_SUCCESS! exit now ...\r\n", __func__);
 		return XST_FAILURE;
 	}
 
+	printf("@debug in %s: SpiConfig->BaseAddress = 0x%08x\r\n", __func__, SpiConfig->BaseAddress);
+
+	// return XST_SUCCESS;
+	return 0;
 	/*
 	 * Perform a self-test to check hardware build.
 	 */
+
+	printf("--> debug -- 2\r\n");
 	Status = XSpiPs_SelfTest(&Spi0);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
 	xil_printf("%s self test succ\r\n", __func__);
 
+	printf("--> debug -- 3\r\n");
 	Status = XSpiPs_SetOptions(&Spi0, XSPIPS_MASTER_OPTION);
 	if (Status != XST_SUCCESS) {
 		xil_printf("%s XSpiPs_SetOptions fail\n", __func__);
 		return XST_FAILURE;
 	}
 
+	printf("--> debug -- 4\r\n");
 	Status = XSpiPs_SetClkPrescaler(&Spi0, XSPIPS_CLK_PRESCALE_64);
 	if (Status != XST_SUCCESS) {
 		xil_printf("%s XSpiPs_SetClkPrescaler fail\n", __func__);
 		return XST_FAILURE;
 	}
 
+	printf("--> debug -- 5\r\n");
 	XSpiPs_Enable(&Spi0);
 	xil_printf("spi 0 config finish\n");
 	return XST_SUCCESS;

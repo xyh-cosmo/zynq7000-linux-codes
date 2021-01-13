@@ -56,6 +56,10 @@
 #include "xspips.h"
 #include "xparameters.h"
 
+#include "xil_printf.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
@@ -89,8 +93,12 @@ XSpiPs_Config *XSpiPs_LookupConfig(u16 DeviceId)
 	XSpiPs_Config *CfgPtr = NULL;
 	u32 Index;
 
+	// printf("##debug## XPAR_XSPIPS_NUM_INSTANCES = %d\r\n", XPAR_XSPIPS_NUM_INSTANCES);
+
 	for (Index = 0U; Index < (u32)XPAR_XSPIPS_NUM_INSTANCES; Index++) {
+		// printf("--> debugging in XSpiPs_LookupConfig(*)\r\n");
 		if (XSpiPs_ConfigTable[Index].DeviceId == DeviceId) {
+			// printf("&&&&&&&&&&&&> debugging in XSpiPs_LookupConfig(*)\r\n");
 			CfgPtr = &XSpiPs_ConfigTable[Index];
 			break;
 		}

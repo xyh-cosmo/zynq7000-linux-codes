@@ -77,6 +77,9 @@
 
 #include "xspips.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /************************** Constant Definitions *****************************/
 
 
@@ -168,6 +171,8 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, XSpiPs_Config *ConfigPtr,
 	Xil_AssertNonvoid(InstancePtr != NULL);
 	Xil_AssertNonvoid(ConfigPtr != NULL);
 
+	printf("debug@ %s (line: %d) xxxx\r\n", __func__, __LINE__);
+
 	/*
 	 * If the device is busy, disallow the initialize and return a status
 	 * indicating it is already started. This allows the user to stop the
@@ -175,9 +180,11 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, XSpiPs_Config *ConfigPtr,
 	 * initializing. This assumes the busy flag is cleared at startup.
 	 */
 	if (InstancePtr->IsBusy == TRUE) {
+		printf("debug@ %s (line: %d) yyyy\r\n", __func__, __LINE__);
 		Status = (s32)XST_DEVICE_IS_STARTED;
 	} else {
 
+		printf("debug@ %s (line: %d) zzzz-1\r\n", __func__, __LINE__);
 		/*
 		 * Set some default values.
 		 */
@@ -192,6 +199,7 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, XSpiPs_Config *ConfigPtr,
 		InstancePtr->RemainingBytes = 0U;
 		InstancePtr->IsReady = XIL_COMPONENT_IS_READY;
 
+		printf("debug@ %s (line: %d) zzzz-2\r\n", __func__, __LINE__);
 		/*
 		 * Reset the SPI device to get it into its initial state. It is
 		 * expected that device configuration will take place after this
@@ -199,6 +207,7 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, XSpiPs_Config *ConfigPtr,
 		 */
 		XSpiPs_Reset(InstancePtr);
 		Status = (s32)XST_SUCCESS;
+		printf("debug@ %s (line: %d) zzzz-3\r\n", __func__, __LINE__);
 	}
 
 	return Status;
@@ -228,10 +237,14 @@ void XSpiPs_Reset(XSpiPs *InstancePtr)
 	Xil_AssertVoid(InstancePtr != NULL);
 	Xil_AssertVoid(InstancePtr->IsReady == XIL_COMPONENT_IS_READY);
 
+	printf("debug@ %s (line: %d) aaaa\r\n", __func__, __LINE__);
+
 	/*
 	 * Abort any transfer that is in progress
 	 */
 	XSpiPs_Abort(InstancePtr);
+
+	// printf("debug@ %s (line: %d) bbbb\r\n", __func__, __LINE__);
 
         /*
          * Reset any values that are not reset by the hardware reset such that
@@ -239,6 +252,8 @@ void XSpiPs_Reset(XSpiPs *InstancePtr)
          */
         XSpiPs_WriteReg(InstancePtr->Config.BaseAddress, XSPIPS_CR_OFFSET,
                         XSPIPS_CR_RESET_STATE);
+	
+	// printf("debug@ %s (line: %d) cccc\r\n", __func__, __LINE__);
 
 }
 
@@ -1103,6 +1118,9 @@ void XSpiPs_Abort(XSpiPs *InstancePtr)
 	u8 Temp;
 	u32 Check;
 	u32 Count;
+
+	printf("debug@ %s (line: %d) AAAAA\r\n", __func__, __LINE__);
+
 	XSpiPs_Disable(InstancePtr);
 
 	/*
