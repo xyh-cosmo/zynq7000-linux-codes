@@ -77,6 +77,8 @@
 
 #include "xspips.h"
 
+#include "xyh.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -171,7 +173,7 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, XSpiPs_Config *ConfigPtr,
 	Xil_AssertNonvoid(InstancePtr != NULL);
 	Xil_AssertNonvoid(ConfigPtr != NULL);
 
-	printf("debug@ %s (line: %d) xxxx\r\n", __func__, __LINE__);
+	debug_info("Enetring ...");
 
 	/*
 	 * If the device is busy, disallow the initialize and return a status
@@ -180,11 +182,11 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, XSpiPs_Config *ConfigPtr,
 	 * initializing. This assumes the busy flag is cleared at startup.
 	 */
 	if (InstancePtr->IsBusy == TRUE) {
-		printf("debug@ %s (line: %d) yyyy\r\n", __func__, __LINE__);
+		debug_info("SPI device is started ...");
 		Status = (s32)XST_DEVICE_IS_STARTED;
 	} else {
 
-		printf("debug@ %s (line: %d) zzzz-1\r\n", __func__, __LINE__);
+		debug_info("SPI device is not started ...");
 		/*
 		 * Set some default values.
 		 */

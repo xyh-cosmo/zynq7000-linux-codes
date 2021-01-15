@@ -96,13 +96,15 @@ XSpiPs_Config *XSpiPs_LookupConfig(u16 DeviceId)
 	// printf("##debug## XPAR_XSPIPS_NUM_INSTANCES = %d\r\n", XPAR_XSPIPS_NUM_INSTANCES);
 
 	for (Index = 0U; Index < (u32)XPAR_XSPIPS_NUM_INSTANCES; Index++) {
-		// printf("--> debugging in XSpiPs_LookupConfig(*)\r\n");
 		if (XSpiPs_ConfigTable[Index].DeviceId == DeviceId) {
-			// printf("&&&&&&&&&&&&> debugging in XSpiPs_LookupConfig(*)\r\n");
+			printf("==> debugging in %s, found a SPI instance\r\n",__func__);
 			CfgPtr = &XSpiPs_ConfigTable[Index];
 			break;
 		}
 	}
+
+	printf("==> debugging in %s, reached the END.\r\n", __func__);
+
 	return (XSpiPs_Config *)CfgPtr;
 }
 /** @} */

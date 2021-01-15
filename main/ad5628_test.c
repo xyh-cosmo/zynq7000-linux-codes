@@ -22,10 +22,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+// #include <string.h>
+// #include <unistd.h>
+// #include <termios.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+
 #include "xparameters.h"
 #include "xspips.h"
 #include "xil_printf.h"
 #include "sleep.h"
+
+#include "xyh.h"
 
 #define SpiPs_RecvByte(BaseAddress) (u8)XSpiPs_In32((BaseAddress) + XSPIPS_RXD_OFFSET)
 
@@ -42,6 +51,7 @@ XSpiPs Spi0, Spi1;
 unsigned char ReadBuffer[1024];
 unsigned char WriteBuffer[1024]={1,2,3,4,5,6,7,8,9,0};
 
+
 int main(){
 
 	int Status;
@@ -57,7 +67,6 @@ int main(){
 		xil_printf("SPI Selftest Example Failed\r\n");
 		return XST_FAILURE;
 	}
-	return 0;
 
 	// 准备SPI“数据=COMMADN+ADDR+DATA”
 	// "X X X X C3 C2 C1 C0 A3 A2 A1 A0 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0 X X X X X X X X"
@@ -93,13 +102,22 @@ int spi0_init() {
 	 * Initialize the SPI device.
 	 */
 
-	printf("--> debug -- 0\r\n");
-	// printf("@debug in %s: XPAR_XSPIPS_0_DEVICE_ID = %d\r\n",__func__, XPAR_XSPIPS_0_DEVICE_ID);
 	SpiConfig = XSpiPs_LookupConfig(XPAR_XSPIPS_0_DEVICE_ID);
 	if (NULL == SpiConfig) {
-		printf("DEBUG:: %s ==> NULL == SpiConfig! exit now ...\r\n", __func__);
 		return XST_FAILURE;
 	}
+
+	// 此处需要修改BaseAddress
+	u32 BaseAddress = SpiConfig->BaseAddress;
+	u32 fd = open("/dev/mem", O_RDWR | O_SYNC);
+	u32 size = XPAR_PS7_SPI_0_HIGHADDR - XPAR_PS7_SPI_0_BASEADDR;
+	u32* ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, BaseAddress);
+	// SpiConfig->BaseAddress = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, BaseAddress);
+	SpiConfig->BaseAddress = ptr;
+	
+	printf("--> BaseAddress = 0x%08x\r\n", BaseAddress);
+	printf("--> size = %d\r\n", size);
+
 
 	printf("--> debug -- 1\r\n");
 	printf("SpiConfig->BaseAddress = 0x%08x\r\n", SpiConfig->BaseAddress);
@@ -113,8 +131,6 @@ int spi0_init() {
 
 	printf("@debug in %s: SpiConfig->BaseAddress = 0x%08x\r\n", __func__, SpiConfig->BaseAddress);
 
-	// return XST_SUCCESS;
-	return 0;
 	/*
 	 * Perform a self-test to check hardware build.
 	 */
@@ -124,7 +140,9 @@ int spi0_init() {
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
-	xil_printf("%s self test succ\r\n", __func__);
+
+	printf("%s self test succ\r\n", __func__);
+	return 0;
 
 	printf("--> debug -- 3\r\n");
 	Status = XSpiPs_SetOptions(&Spi0, XSPIPS_MASTER_OPTION);
@@ -142,7 +160,9 @@ int spi0_init() {
 
 	printf("--> debug -- 5\r\n");
 	XSpiPs_Enable(&Spi0);
-	xil_printf("spi 0 config finish\n");
+	debug_info("spi 0 config finish\n");
+
+	munmap(ptr, size);
 	return XST_SUCCESS;
 }
 

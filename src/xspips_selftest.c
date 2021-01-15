@@ -55,6 +55,7 @@
 /***************************** Include Files *********************************/
 
 #include "xspips.h"
+#include "xyh.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -105,19 +106,36 @@ s32 XSpiPs_SelfTest(XSpiPs *InstancePtr)
 	/*
 	 * Reset the SPI device to leave it in a known good state
 	 */
+
+	debug_info("start run 1");
 	XSpiPs_Reset(InstancePtr);
+	debug_info("end run 1");
 
 	/*
 	 * All the SPI registers should be in their default state right now.
 	 */
+
+	debug_info("\n======== Start Run-2 ========");
 	Register = XSpiPs_ReadReg(InstancePtr->Config.BaseAddress,
 				 XSPIPS_CR_OFFSET);
-	if (Register != XSPIPS_CR_RESET_STATE) {
-		return (s32)XST_REGISTER_ERROR;
-	}
+
+	printf("## BaseAddress : 0x%08x\r\n", InstancePtr->Config.BaseAddress);
+	printf("## Register : 0x%08x\r\n", Register);
+	printf("## XSPIPS_CR_RESET_STATE : 0x%08x\r\n", XSPIPS_CR_RESET_STATE);				 
+	// debug_info("End Run-2");
+
+	// if (Register != XSPIPS_CR_RESET_STATE) {
+	// 	return (s32)XST_REGISTER_ERROR;
+	// }
 
 	Register = XSpiPs_ReadReg(InstancePtr->Config.BaseAddress,
 				 XSPIPS_SR_OFFSET);
+
+	printf("** BaseAddress : 0x%08x\r\n", InstancePtr->Config.BaseAddress);
+	printf("** Register : 0x%08x\r\n", Register);
+	printf("** XSPIPS_ISR_RESET_STATE : 0x%08x\r\n", XSPIPS_ISR_RESET_STATE);				 
+	debug_info("\n======== End Run-2 ========");
+
 	if (Register != XSPIPS_ISR_RESET_STATE) {
 		return (s32)XST_REGISTER_ERROR;
 	}
